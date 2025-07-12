@@ -111,6 +111,13 @@
     @keyframes blink {
       50% { opacity: 0; }
     }
+
+    .dimmed-text {
+  color: rgba(255, 255, 255, 0.4); /* светло-серый, прозрачный */
+  user-select: none;               /* чтобы текст не выделялся */
+  font-weight: 600;
+  font-size: 0.9em;
+}
   </style>
 </head>
 <body class="scanlines">
@@ -125,7 +132,7 @@
     <div class="info-line" style="--i:7">🛠 Доп. информация:</div>
     <div class="info-line" style="--i:8">C# разработчик, не создаю вреда.</div>
     <div class="info-line" style="--i:9">Работаю чисто, профессионально и с уважением к другим.</div>
-    <div class="footer">Last update: 2025</div>
+    <div class="footer">Last update: 2025 <p class="dimmed-text">#1</p></div>
   </div>
 </body>
 </html>
