@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deox Studio — Редактор HTML</title>
+
+<!-- GrapesJS CSS -->
+<link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
+
+<style>
+:root{
+  --bg: #071017;
+  --surface: #0f1720;
+  --muted: #98A0A6;
+  --text: #E6EEF3;
+  --accent: #7C9CBF;
+  --glass: rgba(255,255,255,0.03);
+  --radius: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+html{scroll-behavior:smooth;}
+body{
+  min-height:100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  line-height:1.45;
+  display:flex;
+  flex-direction:column;
+  overflow-y: scroll;
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar { width: 10px; background: transparent; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: #22303d; border-radius: 8px; border: 2px solid var(--bg); transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover { background: #3a5062; }
+* { scrollbar-width: thin; scrollbar-color: #22303d var(--bg); }
+
+/* Навбар */
+header{
+  width:100%; backdrop-filter: blur(6px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  position: sticky; top:0; z-index:1000;
+}
+.container{max-width:1200px;margin:0 auto;padding:20px;}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.brand{display:flex;gap:12px;align-items:center;font-weight:600;}
+.logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#274563,#4a6b8a);display:inline-block;box-shadow:0 4px 18px rgba(10,20,30,0.5);}
+nav ul{display:flex;gap:12px;list-style:none;}
+nav a{color:var(--muted);text-decoration:none;font-size:0.95rem;padding:8px 10px;border-radius:8px;}
+nav a:hover{color:var(--text);background:var(--glass);}
+
+.btn{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.06);
+  color:var(--text);
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+.btn.primary{
+  background:linear-gradient(180deg, rgba(124,156,191,0.14), rgba(124,156,191,0.08));
+  border:1px solid rgba(124,156,191,0.18);
+  color:var(--text);
+}
+.btn:active{transform:translateY(1px);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <div>
+        <div>Deox Studio</div>
+        <div style="font-size:0.75rem;color:var(--muted)">Редактор HTML</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn primary" id="openHtmlBtn">Открыть HTML</button>
+      <button class="btn primary" id="saveHtmlBtn">Скачать HTML</button>
+      <button class="btn primary" id="addBlockBtn">Добавить блок</button>
+    </div>
+  </div>
+</header>
+
+<section style="flex:1; min-height:500px;">
+  <div id="gjs" style="height:90vh; border:1px solid rgba(255,255,255,0.03);"></div>
+</section>
+
+<!-- GrapesJS -->
+<script src="https://unpkg.com/grapesjs"></script>
+<script src="https://unpkg.com/grapesjs-preset-webpage"></script>
+<script>
+const editor = grapesjs.init({
+  container: '#gjs',
+  fromElement: true,
+  height: '100%',
+  width: 'auto',
+  storageManager: false,
+  plugins: ['gjs-preset-webpage'],
+  pluginsOpts: {
+    'gjs-preset-webpage': {}
+  }
+});
+
+// Сохранение HTML
+document.getElementById('saveHtmlBtn').onclick = () => {
+  const html = editor.getHtml();
+  const css = editor.getCss();
+  const blob = new Blob([`<style>${css}</style>${html}`], {type: "text/html"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "page.html";
+  link.click();
+};
+
+// Загрузка HTML
+document.getElementById('openHtmlBtn').onclick = () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.html';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event){
+      editor.setComponents(event.target.result);
+    }
+    reader.readAsText(file);
+  };
+  input.click();
+};
+
+// Добавление кастомного блока
+document.getElementById('addBlockBtn').onclick = () => {
+  editor.BlockManager.add('custom-block', {
+    label: 'Мой блок',
+    content: '<section style="padding:20px; border:1px solid #ccc; background:#0f1720; color:#E6EEF3;">Новый кастомный блок</section>',
+    category: 'Custom',
+    attributes: {class:'fa fa-square'}
+  });
+  alert('Блок добавлен в боковую панель блоков!');
+};
+</script>
+</body>
+</html>
